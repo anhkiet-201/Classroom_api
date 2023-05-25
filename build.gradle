@@ -1,0 +1,52 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+	id 'org.springframework.boot' version '3.1.0'
+	id 'io.spring.dependency-management' version '1.1.0'
+	id 'org.jetbrains.kotlin.jvm' version '1.8.21'
+	id 'org.jetbrains.kotlin.plugin.spring' version '1.8.21'
+	id 'org.jetbrains.kotlin.plugin.jpa' version '1.8.21'
+}
+
+group = 'com.chin'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
+	implementation 'org.jetbrains.kotlin:kotlin-reflect'
+//	runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc:12.2.0.jre11'
+	runtimeOnly 'mysql:mysql-connector-java:8.0.26'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
+	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+	implementation group: 'org.springframework.security', name: 'spring-security-core', version: '6.1.0'
+	// https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
+	compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
+	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-oauth2-resource-server
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+
+
+
+
+}
+
+tasks.withType(KotlinCompile) {
+	kotlinOptions {
+		freeCompilerArgs = ['-Xjsr305=strict']
+		jvmTarget = '17'
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
