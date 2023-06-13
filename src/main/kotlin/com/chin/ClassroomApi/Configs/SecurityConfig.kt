@@ -21,7 +21,6 @@ import org.springframework.security.oauth2.server.resource.authentication.Bearer
 class SecurityConfig (
     private val tokenService: TokenService,
 ) {
-
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         // Define public and private routes
@@ -36,6 +35,7 @@ class SecurityConfig (
             it.jwt {
             }
         }
+
         http.authenticationManager { auth ->
             val jwt = auth as BearerTokenAuthenticationToken
             val user = tokenService.parseToken(jwt.token) ?: throw InvalidBearerTokenException("Invalid token")

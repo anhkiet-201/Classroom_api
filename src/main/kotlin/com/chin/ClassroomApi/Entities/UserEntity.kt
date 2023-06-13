@@ -28,10 +28,11 @@ data class UserEntity(
     var password: String,
 
     /// Relationship
+    @JsonIgnore
+    @OneToMany(mappedBy = "classOwner", fetch = FetchType.EAGER)
+    var classroomEntity: List<ClassroomEntity>?,
 
-    @OneToOne(mappedBy = "classOwner")
-    var classroomEntity: ClassroomEntity?,
-
+    @JsonIgnore
     @ManyToMany(mappedBy = "classMembers", fetch = FetchType.EAGER)
     var joinClasses: List<ClassroomEntity>?
 )
