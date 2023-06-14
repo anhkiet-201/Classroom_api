@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api")
 class AuthController(
-    private val tokenService: TokenService,
-    private val userService: UserService
+        private val tokenService: TokenService,
+        private val userService: UserService
 ) {
     @PostMapping("/login")
     fun login(@RequestBody payload: LoginRequest): JsonResponseType {
@@ -25,21 +25,20 @@ class AuthController(
         return user.responseCustom {
             when (it) {
                 null -> ResponseBuilder(
-                    ResponseBuilder.UNAUTHORIZED,
-                    "Login failure",
-                    reason = "Email not match!"
+                        ResponseBuilder.UNAUTHORIZED,
+                        "Login failure",
+                        "reason" to "Email not match!"
                 )
+
                 else -> if (!BCrypt.checkpw(payload.password, it.password)) ResponseBuilder(
-                    ResponseBuilder.UNAUTHORIZED,
-                    "Login failure",
-                    "Password not match!"
+                        ResponseBuilder.UNAUTHORIZED,
+                        "Login failure",
+                        "reason" to "Password not match!"
                 ) else ResponseBuilder(
-                    ResponseBuilder.OK,
-                    "Login successful!",
-                    AuthResponse(
-                        tokenService.createToken(payload.email),
-                        it
-                    )
+                        ResponseBuilder.OK,
+                        "Login successful!",
+                        "token" to tokenService.createToken(payload.email),
+                        "user" to it
                 )
             }
         }
@@ -49,29 +48,27 @@ class AuthController(
     fun register(@RequestBody payload: RegisterRequest): JsonResponseType {
         if (userService.existsByEmail(payload.email)) return responseCustom {
             ResponseBuilder(
-                ResponseBuilder.UNAUTHORIZED,
-                "Register failure",
-                "Email already exists"
+                    ResponseBuilder.UNAUTHORIZED,
+                    "Register failure",
+                    "reason" to "Email already exists",
             )
         }
         val user = UserEntity(
-            email = payload.email,
-            displayName = payload.userName,
-            photoUrl = "",
-            password = BCrypt.hashpw(payload.password, BCrypt.gensalt()),
-            birthday = payload.birthDay,
-            classroomEntity = null,
-            joinClasses = null
+                email = payload.email,
+                displayName = payload.userName,
+                photoUrl = "",
+                password = BCrypt.hashpw(payload.password, BCrypt.gensalt()),
+                birthday = payload.birthDay,
+                classroomEntity = null,
+                joinClasses = null
         )
         val savedUser = this.userService.save(user)
         return responseCustom {
             ResponseBuilder(
-                ResponseBuilder.OK,
-                "Register successful!",
-                AuthResponse(
-                    tokenService.createToken(payload.email),
-                    savedUser
-                )
+                    ResponseBuilder.OK,
+                    "Register successful!",
+                    "token" to tokenService.createToken(payload.email),
+                    "user" to savedUser
             )
         }
     }

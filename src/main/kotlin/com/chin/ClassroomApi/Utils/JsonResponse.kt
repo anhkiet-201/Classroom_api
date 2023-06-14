@@ -3,42 +3,15 @@ package com.chin.ClassroomApi.Utils
 import org.springframework.http.ResponseEntity
 
 typealias JsonResponseType = ResponseEntity<Map<String, Any?>>
+typealias PairType = Pair<String, Any>
 
-class ResponseBuilder {
+class ResponseBuilder(private var status: Int, private var message: String, vararg params: PairType = emptyArray()) {
 
-    private var status: Int
-    private var message: String
-    private var reason: String
-    private var data: Any?
+    var params: List<PairType>
 
-    constructor(status: Int, message: String, reason: String, data: Any?) {
-        this.status = status
-        this.message = message
-        this.reason = reason
-        this.data = data
+    init {
+        this.params = params.toList()
     }
-
-    constructor(status: Int, message: String, reason: String) {
-        this.status = status
-        this.message = message
-        this.reason = reason
-        this.data = null
-    }
-
-    constructor(status: Int, message: String, data: Any?) {
-        this.status = status
-        this.message = message
-        this.data = data
-        this.reason = ""
-    }
-
-    constructor(status: Int, message: String) {
-        this.status = status
-        this.message = message
-        this.data = null
-        this.reason = ""
-    }
-
 
     companion object {
         const val OK = 200
@@ -50,28 +23,23 @@ class ResponseBuilder {
     }
 
     fun toResponse(): JsonResponseType {
-        var map = mapOf(
-            "status" to status,
-            "message" to message,
-            "data" to (data ?: "null"),
+        var map: Map<String, Any> = mapOf(
+                "status" to status,
+                "message" to message,
         )
-        if (reason.isNotBlank())
-            map = map.plus(
-            "reason" to reason
-            )
+        map = map.plus(params)
         return ResponseEntity.status(status).body(
-            map
+                map
         )
     }
 }
-
-inline fun<T> T.response(success: (T) -> ResponseBuilder, error: (T) -> ResponseBuilder): JsonResponseType {
+inline fun <T> T.response(success: (T) -> ResponseBuilder, error: (T) -> ResponseBuilder): JsonResponseType {
     return when (this) {
         null -> error(this)
         else -> success(this)
     }.toResponse()
 }
 
-infix fun<T> T.responseCustom(builder: (T) -> ResponseBuilder): JsonResponseType {
+infix fun <T> T.responseCustom(builder: (T) -> ResponseBuilder): JsonResponseType {
     return builder(this).toResponse()
 }
